@@ -3,9 +3,9 @@ require './book'
 require './reader'
 require './order'
 require 'facets'
+require 'pry'
 
 class Library
-
   attr_accessor :authors, :books, :readers, :orders
 
   def initialize
@@ -32,73 +32,22 @@ class Library
   end
 
   def find_most_popular_books
-
-    # @orders.map(&:book).frequency.sort_by(&:last).each { |k, v| puts "#{k} appears #{v} times" }
     p = @orders.map(&:book).frequency.sort_by(&:last).last
     puts "The most popular book is \"#{p[0]}\". It was taken #{p[1]} times."
-
   end
 
   def find_most_popular_reader
-    # d = Hash.new(0)
-    #
-    # @orders.each do |v|
-    #   d[v.reader] += 1
-    # end
-    #
-    # d.sort.each do |reader, frequency|
-    #   puts "Reader #{reader} get book #{frequency} times"
-    # end
-
     r = @orders.map(&:reader).frequency.sort_by(&:last).last
     puts "#{r[0]} most active reader, he took #{r[1]} books."
-
   end
 
   def how_much_took_popular_books
-    # h = @orders.map(&:book).sort_by(&:last).last(3)
-    #
-    # h = Hash.new(0)
-    #
-    # @orders.each do |v|
-    #   h[v.book] = v.reader
-    # end
-    #
-    # puts "#{h}"
-    # h = @orders.map(&:book).frequency.sort_by(&:last).last(3)
-    # h.each {|k, v| puts "#{k} was taken #{v} times" }
-    #
-    # h = @orders.each do |v|
-    #   z = Array.new(v)
-    #   z << v.book
-    #   z << v.reader
-    # end
-    # puts h
-
-    d = Hash.new(0)
-
-    @orders.each do |item1, item2|
-      if d[item1.book] && d[item1.reader] == d[item2.book] && d[item2.reader]
-        @orders.delete(item2)
-      end
+    p = @orders.group_by(&:book).map { |i, o| [i, o.map(&:reader).uniq.count] }.to_h
+    p.sort_by { |_key, value| value }.last(3).each do |k, v|
+      puts "The book \"#{k}\" was taken by #{v} peoples"
     end
-
-    @orders.each do |v|
-      d[v.book] += 1
-    end
-
-    d.sort.each do |book, frequency|
-      puts "Book #{book} was taken #{frequency} unic users"
-    end
-
-    # z = @orders.map(&:book).frequency.sort_by(&:last).last(3)
-    # z.each do |i|
-    #   puts "#{z[0]} most active reader, he took #{z[1]} books."
-    # end
   end
-
 end
-
 
 first_library = Library.new
 
@@ -176,9 +125,6 @@ first_library.add_order(order15)
 first_library.add_order(order16)
 first_library.add_order(order17)
 
-# first_library.orders.each do |order|
-#   puts "Order: #{Order.book}, #{@reader}, #{@date}"
-# end
 first_library.find_most_popular_books
 first_library.find_most_popular_reader
 first_library.how_much_took_popular_books
