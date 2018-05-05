@@ -2,9 +2,10 @@ require './author'
 require './book'
 require './reader'
 require './order'
+require 'facets'
+require 'pry'
 
 class Library
-
   attr_accessor :authors, :books, :readers, :orders
 
   def initialize
@@ -30,21 +31,23 @@ class Library
     @orders << new_order
   end
 
-  def find_most_popular
-    b = Hash.new(0)
-
-    # iterate over the array, counting duplicate entries
-    @orders.map.each do |v|
-      b[v] += 1
-    end
-
-    b.each do |k, v|
-      puts "#{k} appears #{v} times"
-    end
+  def find_most_popular_books
+    p = @orders.map(&:book).frequency.sort_by(&:last).last
+    puts "The most popular book is \"#{p[0]}\". It was taken #{p[1]} times."
   end
 
-end
+  def find_most_popular_reader
+    r = @orders.map(&:reader).frequency.sort_by(&:last).last
+    puts "#{r[0]} most active reader, he took #{r[1]} books."
+  end
 
+  def how_much_took_popular_books
+    p = @orders.group_by(&:book).map { |i, o| [i, o.map(&:reader).uniq.count] }.to_h
+    p.sort_by { |_key, value| value }.last(3).each do |k, v|
+      puts "The book \"#{k}\" was taken by #{v} peoples"
+    end
+  end
+end
 
 first_library = Library.new
 
@@ -102,6 +105,7 @@ order13 = Order.new("The Empire of the Angels", "Chewbacca")
 order14 = Order.new("The Butterfly of the Stars", "Tony Stark")
 order15 = Order.new("The Butterfly of the Stars", "Tony Stark")
 order16 = Order.new("The Butterfly of the Stars", "Jack Daniels")
+order17 = Order.new("The Butterfly of the Stars", "Chewbacca")
 
 first_library.add_order(order1)
 first_library.add_order(order2)
@@ -119,8 +123,8 @@ first_library.add_order(order13)
 first_library.add_order(order14)
 first_library.add_order(order15)
 first_library.add_order(order16)
+first_library.add_order(order17)
 
-# first_library.orders.each do |order|
-#   puts "Order: #{Order.book}, #{@reader}, #{@date}"
-# end
-first_library.find_most_popular
+first_library.find_most_popular_books
+first_library.find_most_popular_reader
+first_library.how_much_took_popular_books
