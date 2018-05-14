@@ -21,4 +21,6 @@
 
 ## Start work
 
-* run file library.rb
+
+* install gem 'facets' (https://rubygems.org/gems/facets)
+* run file init.rb
